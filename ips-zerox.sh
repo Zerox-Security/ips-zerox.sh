@@ -29,3 +29,23 @@ iptables -A INPUT -p tcp -m tcp --tcp-flags ACK,URG URG -j DROP
 iptables-save > /etc/iptables/rules.v4
 
 
+# Ruta al archivo de reglas IPTables
+RULES_FILE="/etc/iptables/rules.v4"
+
+# Verifica si el archivo de reglas existe
+if [ -f "$RULES_FILE" ]; then
+  # Crea una copia de seguridad del archivo de reglas original
+  cp "$RULES_FILE" "$RULES_FILE.bak"
+
+  # Utiliza awk para eliminar las reglas duplicadas y guardar el resultado en un nuevo archivo temporal
+  awk '!seen[$0]++' "$RULES_FILE" > "$RULES_FILE.tmp"
+
+  # Reemplaza el archivo original con el archivo temporal
+  mv "$RULES_FILE.tmp" "$RULES_FILE"
+
+  echo "Reglas duplicadas eliminadas del archivo $RULES_FILE"
+else
+  echo "El archivo de reglas $RULES_FILE no existe."
+fi
+
+
